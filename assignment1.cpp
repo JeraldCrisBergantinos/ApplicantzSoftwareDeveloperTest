@@ -19,26 +19,29 @@
 #include <cassert>
 #include <cctype>
 #include <algorithm>
+#include <sstream>
 #include <iostream>
 
 std::string reverse_words(const std::string &str)
 {
     // TODO: Implement this function
-    std::string strResult;
-    std::string strCurrentWord;
+    std::stringstream ssResult;
+    std::stringstream ssCurrentWord;
     for (char c : str) {
-        if (isalnum(c)) strCurrentWord += c;
+        if (isalnum(c)) ssCurrentWord << c;
         else {
-            if (!strCurrentWord.empty()) {
-                std::reverse(strCurrentWord.begin(), strCurrentWord.end());
-                strResult += strCurrentWord;
-                strCurrentWord = "";
-            }
-            strResult += c;
+            std::string strWord = ssCurrentWord.str();
+            std::reverse(strWord.begin(), strWord.end());
+            ssResult << strWord << c;
+            ssCurrentWord.str("");
         }
     }
 
-    return strResult;
+    std::string strLastWord = ssCurrentWord.str();
+    std::reverse(strLastWord.begin(), strLastWord.end());
+    ssResult << strLastWord;
+
+    return ssResult.str();
 }
 
 int main()

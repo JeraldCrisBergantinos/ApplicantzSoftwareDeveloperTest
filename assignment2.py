@@ -42,7 +42,7 @@ def update_version_in_file(filepath: str, pattern: str, replacement: str) -> Non
         # Create a temporary file
         temp_filepath = filepath + ".tmp"
 
-        # Change file permission to allow write
+        # Change permission of the actual file to allow read
         os.chmod(filepath, 0o755)
 
         # Open both actual file and temporary file

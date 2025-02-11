@@ -28,34 +28,38 @@
 // Sample Output: gnirtS; eb2 desrever...
 std::string reverse_words(const std::string &str)
 {
-    std::stringstream result_stream;
-    std::stringstream current_word_stream;
+    std::string result = "";
+    std::string current_word = "";
     for (char c : str)
     {
         if (isalnum(c)) // Check if the character is alphanumeric (letter or word).
         {
             // Alphanumeric. Append the current character.
-            current_word_stream << c;
+            current_word += c;
         }
         else {
             // Non-alphanumeric. Reverse the current word and append it to the result.
-            std::string current_word = current_word_stream.str();
-            std::reverse(current_word.begin(), current_word.end());
-            result_stream << current_word << c; // Append also the current character.
-            current_word_stream.str(""); // Clear the current word.
+            if (!current_word.empty())
+            {
+                std::reverse(current_word.begin(), current_word.end());
+                result += current_word;
+                current_word.clear(); // Reset for next word.
+            }
+
+            // Append also the current character.
+            result += c;
         }
     }
 
     // Handle the last word if it exists in case
     // the string doesn't end with a non-alphanumeric character
-    if (!current_word_stream.str().empty())
+    if (!current_word.empty())
     {
-        std::string last_word = current_word_stream.str();
-        std::reverse(last_word.begin(), last_word.end());
-        result_stream << last_word;
+        std::reverse(current_word.begin(), current_word.end());
+        result += current_word;
     }
 
-    return result_stream.str();
+    return result;
 }
 
 // Function declaration for additional tests.
@@ -67,6 +71,7 @@ int main()
     std::string test_str = "String; 2be reversed...";
     assert(reverse_words(test_str) == "gnirtS; eb2 desrever...");
 
+    // Do additional tests.
     additional_tests();
 
     return 0;
@@ -94,6 +99,9 @@ void additional_tests()
     // String starting with a special character
     reverse_words_list.push_back(std::make_pair("!Word", "!droW"));
 
+    // String ending with a special character
+    reverse_words_list.push_back(std::make_pair("Word!", "droW!"));
+
     // Consecutive special characters
     reverse_words_list.push_back(std::make_pair("Word;;;Another", "droW;;;rehtonA"));
 
@@ -109,6 +117,8 @@ void additional_tests()
     // Control characters
     reverse_words_list.push_back(std::make_pair("Word\tAnother\nLine", "droW\trehtonA\neniL"));
 
+    // Additional tests here.
+
     // Do the actual test.
     for (const auto& reverse_words_pair : reverse_words_list) {
         const std::string original_str = reverse_words_pair.first;
@@ -117,7 +127,11 @@ void additional_tests()
         if (reversed_actual_str != reversed_expected_str) // Compare the actual and expected reverse.
         {
             // Not the same. Display an error.
-            std::cerr << "Failed. Original: " << original_str << ", Expected Reversed: " << reversed_expected_str << ", Actual Reversed: " << reversed_actual_str << std::endl;
+            std::cerr << "Failed. Original: " << original_str
+                << ", Expected Reversed: " << reversed_expected_str
+                << ", Actual Reversed: " << reversed_actual_str << std::endl;
         }
     }
+
+    std::cout << "Test finished." << std::endl;
 }

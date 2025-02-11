@@ -29,6 +29,40 @@
 import os
 import re
 
+def update_version_in_file(filepath: str, pattern: str, replacement: str) -> None:
+    """
+    Updates the specific line in a file based on a regex pattern.
+    Args:
+        filepath (str): The path to the file to update.
+        pattern (str): The regx pattern to find the line to update.
+        replacement (str): The replacement string.
+    """
+
+    try:
+        # Create a temporary file
+        temp_filepath = filepath + ".tmp"
+
+        # Change file permission to allow write
+        os.chmod(filepath, 0o755)
+
+        with open(filepath, 'r') as fin, open(temp_filepath, 'w') as fout:
+            for line in fin:
+                updated_line = re.sub(pattern, replacement, line)
+                fout.write(updated_line)
+
+        # Replace original file with the temporary file
+        os.remove(filepath)
+        os.rename(temp_filepath, filepath)
+        print(f"Successfully updated version in {filepath} with {replacement}")
+
+    except FileNotFoundError:
+        print(f"File not found: {filepath}")
+    except OSError as e:
+        print(f"OSError occurred: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+
 # SCONSTRUCT file interesting lines
 # config.version = Version(
 # major=15,
@@ -36,44 +70,56 @@ import re
 # point=6,
 # patch=0
 #)
-def updateSconstruct():
-    "Update the build number in the SConstruct file"
-    os.chmod(os.path.join(os.environ["SourcePath"],"develop","global","src","SConstruct"), 0o755)
-    fin = open(os.path.join(os.environ["SourcePath"],"develop","global","src","SConstruct"), 'r')
-    fout = open(os.path.join(os.environ["SourcePath"],"develop","global","src","SConstruct1"), 'w')
-    for line in fin:
-        line=re.sub(r"point\=[\d]+","point="+os.environ["BuildNum"],line)
-        fout.write(line)
-    fin.close()
-    fout.close()
-    os.remove(os.path.join(os.environ["SourcePath"],"develop","global","src","SConstruct"))
-    os.rename(os.path.join(os.environ["SourcePath"],"develop","global","src","SConstruct1"),
-        os.path.join(os.environ["SourcePath"],"develop","global","src","SConstruct"))
+def update_sconstruct(source_path: str, build_num: str) -> None:
+    """
+    Updates the build number in the SConstruct file
+    Args:
+        source_path (str): The root path where the SCONSTRUCT file is located.
+        build_num (str): The build number to update.
+    """
+
+    filepath = os.path.join(source_path, "develop", "global", "src", "SConstruct")
+    pattern = r"point\=[\d]+"
+    replacement = f"point={build_num}"
+    update_version_in_file(filepath, pattern, replacement)
+
 
 # VERSION file interesting line
 # ADLMSDK_VERSION_POINT=6
-def updateVersion():
-    "Update the build number in the VERSION file"
-    os.chmod(os.path.join(os.environ["SourcePath"],"develop","global","src","VERSION"), 0o755)
-    fin = open(os.path.join(os.environ["SourcePath"],"develop","global","src","VERSION"), 'r')
-    fout = open(os.path.join(os.environ["SourcePath"],"develop","global","src","VERSION1"), 'w')
-    for line in fin:
-        line=re.sub(r"ADLMSDK_VERSION_POINT=[\d]+","ADLMSDK_VERSION_POINT="+os.environ["BuildNum"],line)
-        fout.write(line)
-    fin.close()
-    fout.close()
-    os.remove(os.path.join(os.environ["SourcePath"],"develop","global","src","VERSION"))
-    os.rename(os.path.join(os.environ["SourcePath"],"develop","global","src","VERSION1"),
-        os.path.join(os.environ["SourcePath"],"develop","global","src","VERSION"))
+def update_version(source_path: str, build_num: str) -> None:
+    """
+    Updates the build number in the VERSION file
+    Args:
+        source_path (str): The root path where the VERSION file is located.
+        build_num (str): The build number to update.
+    """
 
-def main():
-    updateSconstruct()
-    updateVersion()
+    filepath = os.path.join(source_path, "develop", "global", "src", "VERSION")
+    pattern = r"ADLMSDK_VERSION_POINT=[\d]+"
+    replacement = f"ADLMSDK_VERSION_POINT={build_num}"
+    update_version_in_file(filepath, pattern, replacement)
 
-main()
+
+def main() -> None:
+    """
+    Main function to update version numbers in files.
+    """
+
+    source_path = os.environ.get("SourcePath")
+    build_num = os.environ.get("BuildNum")
+    if not source_path or not build_num:
+        print("SourcePath or BuildNum environment variables not set.")
+        return
+
+    update_sconstruct(source_path, build_num)
+    update_version(source_path, build_num)
+
+
+if __name__ == "__main__":
+    main()
 
 # Before executing this script, set the SourcePath and BuildNum environment variables first.
 # Example:
 # export SourcePath="/workspaces/ApplicantzSoftwareDeveloperTest/assignment2_test"
-# export BuildNum=999
+# export BuildNum="999"
 # python assignment2.py

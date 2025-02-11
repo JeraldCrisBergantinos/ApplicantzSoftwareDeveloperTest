@@ -45,8 +45,10 @@ def update_version_in_file(filepath: str, pattern: str, replacement: str) -> Non
         # Change file permission to allow write
         os.chmod(filepath, 0o755)
 
+        # Open both actual file and temporary file
         with open(filepath, 'r') as fin, open(temp_filepath, 'w') as fout:
             for line in fin:
+                # Read from actual file, update it, and write to temporary file
                 updated_line = re.sub(pattern, replacement, line)
                 fout.write(updated_line)
 
@@ -78,9 +80,12 @@ def update_sconstruct(source_path: str, build_num: str) -> None:
         build_num (str): The build number to update.
     """
 
+    # Prepare arguments to update SCONSTRUCT file
     filepath = os.path.join(source_path, "develop", "global", "src", "SConstruct")
     pattern = r"point\=[\d]+"
     replacement = f"point={build_num}"
+
+    # Update SCONSTRUCT file
     update_version_in_file(filepath, pattern, replacement)
 
 
@@ -94,9 +99,12 @@ def update_version(source_path: str, build_num: str) -> None:
         build_num (str): The build number to update.
     """
 
+    # Prepare arguments to update VERSION file
     filepath = os.path.join(source_path, "develop", "global", "src", "VERSION")
     pattern = r"ADLMSDK_VERSION_POINT=[\d]+"
     replacement = f"ADLMSDK_VERSION_POINT={build_num}"
+
+    # Update VERSION file
     update_version_in_file(filepath, pattern, replacement)
 
 
@@ -105,12 +113,16 @@ def main() -> None:
     Main function to update version numbers in files.
     """
 
+    # Get environment variables
     source_path = os.environ.get("SourcePath")
     build_num = os.environ.get("BuildNum")
+
+    # Check if the environment variables exists
     if not source_path or not build_num:
         print("SourcePath or BuildNum environment variables not set.")
-        return
+        return # Exit
 
+    # Update SCONSTRUCT and VERSION files
     update_sconstruct(source_path, build_num)
     update_version(source_path, build_num)
 

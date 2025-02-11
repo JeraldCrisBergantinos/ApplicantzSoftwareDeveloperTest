@@ -20,6 +20,7 @@
 #include <cctype>
 #include <algorithm>
 #include <sstream>
+#include <vector>
 #include <iostream>
 
 // Function to reverse string.
@@ -54,8 +55,6 @@ std::string reverse_words(const std::string &str)
         result_stream << last_word;
     }
 
-    std::cout << str << " " << result_stream.str() << std::endl;
-
     return result_stream.str();
 }
 
@@ -75,41 +74,50 @@ int main()
 
 void additional_tests()
 {
+    std::vector< std::pair<std::string, std::string> > reverse_words_list;
+
     // Additional basic tests
-    std::string test_str1 = "Another test123 string.";
-    assert(reverse_words(test_str1) == "rehtonA 321tset gnirts.");
-
-    std::string test_str2 = "LastWord";
-    assert(reverse_words(test_str2) == "droWtsaL");
-
-    std::string test_str3 = "";
-    assert(reverse_words(test_str3) == "");
-
-    std::string test_str4 = "  Leading and trailing spaces  ";
-    assert(reverse_words(test_str4) == "  gnidaeL dna gniliart secaps  ");
-
-    std::string test_str5 = "Mixed123;Chars!456";
-    assert(reverse_words(test_str5) == "321dexiM;srahC!654");
+    reverse_words_list.push_back(std::make_pair("Another test123 string.", "rehtonA 321tset gnirts."));
+    reverse_words_list.push_back(std::make_pair("LastWord", "droWtsaL"));
+    reverse_words_list.push_back(std::make_pair("", ""));
+    reverse_words_list.push_back(std::make_pair("  Leading and trailing spaces  ", "  gnidaeL dna gniliart secaps  "));
+    reverse_words_list.push_back(std::make_pair("Mixed123;Chars!456", "321dexiM;srahC!654"));
 
     // Edge cases
 
     // Numbers only
-    std::string test_str6 = "12345";
-    assert(reverse_words(test_str6) == "54321");
+    reverse_words_list.push_back(std::make_pair("12345", "54321"));
 
     // Special characters only
-    std::string test_str7 = ";;,...";
-    assert(reverse_words(test_str7) == ";;,...");
+    reverse_words_list.push_back(std::make_pair(";;,...", ";;,..."));
 
     // String starting with a special character
-    std::string test_str8 = "!Word";
-    assert(reverse_words(test_str8) == "!droW");
+    reverse_words_list.push_back(std::make_pair("!Word", "!droW"));
 
     // Consecutive special characters
-    std::string test_str9 = "Word;;;Another";
-    assert(reverse_words(test_str9) == "droW;;;rehtonA");
+    reverse_words_list.push_back(std::make_pair("Word;;;Another", "droW;;;rehtonA"));
 
     // Numbers and special characters mixed
-    std::string test_str10 = "123;abc!456";
-    assert(reverse_words(test_str10) == "321;cba!654");
+    reverse_words_list.push_back(std::make_pair("123;abc!456", "321;cba!654"));
+
+    // Longer string
+    reverse_words_list.push_back(std::make_pair(
+        "This is a longer string with multiple words and some special characters like ,.!?; and numbers 12345.",
+        "sihT si a regnol gnirts htiw elpitlum sdrow dna emos laiceps sretcarahc ekil ,.!?; dna srebmun 54321.")
+    );
+
+    // Control characters
+    reverse_words_list.push_back(std::make_pair("Word\tAnother\nLine", "droW\trehtonA\neniL"));
+
+    // Do the actual test.
+    for (const auto& reverse_words_pair : reverse_words_list) {
+        const std::string original_str = reverse_words_pair.first;
+        const std::string reversed_expected_str = reverse_words_pair.second;
+        const std::string reversed_actual_str = reverse_words(original_str);
+        if (reversed_actual_str != reversed_expected_str) // Compare the actual and expected reverse.
+        {
+            // Not the same. Display an error.
+            std::cerr << "Failed. Original: " << original_str << ", Expected Reversed: " << reversed_expected_str << ", Actual Reversed: " << reversed_actual_str << std::endl;
+        }
+    }
 }

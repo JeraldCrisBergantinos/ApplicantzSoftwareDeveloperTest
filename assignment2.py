@@ -38,11 +38,11 @@ import re
 #)
 def updateSconstruct():
     "Update the build number in the SConstruct file"
-    os.chmod(os.path.join(os.environ["SourcePath"],"develop","global","src","SConstruct"), 0755)
+    os.chmod(os.path.join(os.environ["SourcePath"],"develop","global","src","SConstruct"), 0o755)
     fin = open(os.path.join(os.environ["SourcePath"],"develop","global","src","SConstruct"), 'r')
     fout = open(os.path.join(os.environ["SourcePath"],"develop","global","src","SConstruct1"), 'w')
     for line in fin:
-        line=re.sub("point\=[\d]+","point="+os.environ["BuildNum"],line)
+        line=re.sub(r"point\=[\d]+","point="+os.environ["BuildNum"],line)
         fout.write(line)
     fin.close()
     fout.close()
@@ -54,11 +54,11 @@ def updateSconstruct():
 # ADLMSDK_VERSION_POINT=6
 def updateVersion():
     "Update the build number in the VERSION file"
-    os.chmod(os.path.join(os.environ["SourcePath"],"develop","global","src","VERSION"), 0755)
+    os.chmod(os.path.join(os.environ["SourcePath"],"develop","global","src","VERSION"), 0o755)
     fin = open(os.path.join(os.environ["SourcePath"],"develop","global","src","VERSION"), 'r')
     fout = open(os.path.join(os.environ["SourcePath"],"develop","global","src","VERSION1"), 'w')
     for line in fin:
-        line=re.sub("ADLMSDK_VERSION_POINT=[\d]+","ADLMSDK_VERSION_POINT="+os.environ["BuildNum"],line)
+        line=re.sub(r"ADLMSDK_VERSION_POINT=[\d]+","ADLMSDK_VERSION_POINT="+os.environ["BuildNum"],line)
         fout.write(line)
     fin.close()
     fout.close()
@@ -71,3 +71,9 @@ def main():
     updateVersion()
 
 main()
+
+# Before executing this script, set the SourcePath and BuildNum environment variables first.
+# Example:
+# export SourcePath="/workspaces/ApplicantzSoftwareDeveloperTest/assignment2_test"
+# export BuildNum=999
+# python assignment2.py
